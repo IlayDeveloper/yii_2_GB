@@ -14,12 +14,23 @@ namespace app\models;
  */
 class Product extends \yii\db\ActiveRecord
 {
+    const SCENARIO_CREATE = 'create';
+    const SCENARIO_UPDATE = 'update';
+
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
         return 'product';
+    }
+
+    public function scenarios()
+    {
+        return [
+            static::SCENARIO_CREATE => ['name', 'description', 'price'],
+            static::SCENARIO_UPDATE => ['description', 'price'],
+        ];
     }
 
     /**
@@ -29,7 +40,11 @@ class Product extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'price'], 'required'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['name'], 'filter', 'filter' => function($name){
+                return $name = trim(strip_tags($name));
+            }],
+            [['created_at', 'updated_at'], 'string'],
+            [['name'], 'string', 'max' => 20],
             [['name', 'price'], 'string', 'max' => 50],
             [['description'], 'string', 'max' => 255],
         ];
